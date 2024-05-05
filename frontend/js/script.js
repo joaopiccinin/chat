@@ -63,31 +63,12 @@ const createMessageOther = (content, sender, senderColor) => {
     return div;
 }
 
-const createMessageNewClient = (userName) => {
-    const section = document.createElement("section");
-    const span = document.createElement("span");
-
-    section.classList.add("new__client");
-    section.appendChild(span);
-
-    span.innerHTML = userName;
-
-    return section
-}
-
 const processMessage = ({ data }) => {
     const {userId, userName, userColor, content} = JSON.parse(data);
     const message = userId == user.id ? createMessageSelf(content) : createMessageOther(content, userName, userColor);
 
     chatMessages.appendChild(message);
 
-    scrollScreen();
-}
-
-const processNewClientMessage = ({ data }) => {
-    const {userName} = JSON.parse(data);
-    const messageNewClient = createMessageNewClient(userName);
-    chatMessages.appendChild(messageNewClient);
     scrollScreen();
 }
 
@@ -102,10 +83,6 @@ const handleLogin = (event) => {
     chat.style.display = "flex";
 
     websocket = new WebSocket("ws://localhost:5500");
-    websocket.onopen = processNewClientMessage;
-    websocket.onopen = () => {
-        sendNewClientMessage();
-    };
     websocket.onmessage = processMessage;
 }
 
@@ -121,13 +98,6 @@ const sendMessage = (event) => {
     websocket.send(JSON.stringify(message));
 
     chatInput.value = "";
-}
-
-const sendNewClientMessage = () => {
-    const newClientMessage = {
-        content: user.name
-    }
-    websocket.send(JSON.stringify(newClientMessage))
 }
 
 loginForm.addEventListener("submit", handleLogin);
